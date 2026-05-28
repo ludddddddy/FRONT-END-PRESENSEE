@@ -9,10 +9,24 @@ function Login() {
 
   const [email, setEmail] = useState("")
   const [senha, setSenha] = useState("")
+  const [mostrarSenha, setMostrarSenha] = useState(false)
+  const [erro, setErro] = useState("")
 
   function handleLogin(e) {
 
     e.preventDefault()
+
+     if(email === "" || senha === ""){
+    setErro("Preencha todos os campos")
+    return
+     }
+
+     setErro("")
+
+    console.log(email)
+   console.log(senha)
+
+  navigate("/dashboard")
 
     console.log(email)
     console.log(senha)
@@ -52,15 +66,30 @@ function Login() {
             />
 
             <input
-              type="password"
+              type={mostrarSenha ? "text" : "password"}
               placeholder="Digite sua senha"
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
             />
 
+             <p
+              className="show-password"
+              onClick={() => setMostrarSenha(!mostrarSenha)}
+             >
+              {mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
+             </p>
+
             <button type="submit">
               Entrar
             </button>
+
+             <p className="forgot-password">
+                Esqueci minha senha
+             </p>
+
+             <p className="login-info">
+              Contas disponibilizadas pela administração escolar.
+             </p>
 
           </form>
 

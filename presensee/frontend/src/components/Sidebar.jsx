@@ -1,19 +1,55 @@
-function Sidebar() {
-    return (
-        <div ClassName= "sidebar">
-            <h2 ClassName="logo">Presensee</h2>
+import { Link } from "react-router-dom"
 
-            <ul ClassName="menu">
-                <li>Dashboard</li>
-                <li>Alunos</li>
-                <li>Turmas</li>
-                <li>Frequência</li>
-                <li>Alertas</li>
-                <li>Relatórios</li>
-            </ul>
-            </div>
-    
-    )
+function Sidebar() {
+  return (
+    <div className="sidebar">
+
+      <h2 className="logo">
+        PresenSee
+      </h2>
+
+      <ul className="menu">
+
+        <li>
+          <Link to="/dashboard">
+            📊 Dashboard
+          </Link>
+        </li>
+
+        <li>
+          <Link to="/alunos">
+            👨‍🎓 Alunos
+          </Link>
+        </li>
+
+        <li>
+          <Link to="/turmas">
+            🏫 Turmas
+          </Link>
+        </li>
+
+        <li>
+          <Link to="/frequencia">
+            📅 Frequência
+          </Link>
+        </li>
+
+        <li>
+          <Link to="/alertas">
+            ⚠️ Alertas
+          </Link>
+        </li>
+
+        <li>
+          <Link to="/relatorios">
+            📑 Relatórios
+          </Link>
+        </li>
+
+      </ul>
+
+    </div>
+  )
 }
 
 export default Sidebar

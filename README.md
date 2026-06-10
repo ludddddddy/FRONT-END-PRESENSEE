@@ -68,10 +68,24 @@ Desenvolver uma solução que auxilie escolas na redução da evasão escolar po
 
 ```
 /monitoramento-escolar
-  ├── frontend-mobile/   # App em React Native
-  ├── backend/           # API (a definir)
-  ├── docs/              # Documentação do projeto
-  └── README.md
+│
+├── Pages
+│   ├── Login
+│   ├── Dashboard
+│   └── Alunos
+│
+├── Components
+│   └── Sidebar
+│
+├── Layouts
+│   └── DashboardLayout
+│
+├── Styles
+│   ├── Login.css
+│   └── Dashboard.css
+│
+└── Router
+    └── App.jsx
 ```
 
 ---
@@ -87,12 +101,15 @@ Desenvolvido com:
 
 ```
 src/
- ├── components/
- ├── screens/
- ├── navigation/
- ├── services/
- ├── hooks/
- └── utils/
+│
+├── components/
+├── layouts/
+├── pages/
+├── styles/
+│
+├── App.jsx
+├── main.jsx
+└── index.css
 ```
 
 ---

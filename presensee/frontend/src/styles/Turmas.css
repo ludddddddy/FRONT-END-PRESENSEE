@@ -1,0 +1,56 @@
+.classes-table{
+
+    width:100%;
+    background:white;
+    border-collapse:collapse;
+    border-radius:15px;
+    overflow:hidden;
+
+}
+
+
+
+.classes-table th{
+
+    background:#111827;
+    color:white;
+    padding:15px;
+    text-align:left;
+
+}
+
+
+
+.classes-table td{
+
+    padding:15px;
+    border-bottom:1px solid #ddd;
+
+}
+
+
+
+.edit-button{
+
+    background:#00b894;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    margin-right:10px;
+
+}
+
+
+
+.delete-button{
+
+    background:#ff7675;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+
+}

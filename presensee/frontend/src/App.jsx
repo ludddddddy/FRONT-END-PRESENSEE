@@ -7,6 +7,7 @@ import Alertas from "./pages/Alertas"
 import Frequencia from "./pages/Frequencia"
 import Relatorios from "./pages/Relatorios"
 import Turmas from "./pages/Turmas"
+import NovoAluno from "./pages/NovoAluno"
 
 function App() {
   return (
@@ -24,6 +25,8 @@ function App() {
         <Route path="/Frequencia" element={<Frequencia />} />
 
         <Route path="/Relatorios" element={<Relatorios />} />
+
+        <Route path="/novo-aluno" element={<NovoAluno />} />
 
         <Route
           path="/dashboard"

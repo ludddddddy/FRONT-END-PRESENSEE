@@ -1,0 +1,59 @@
+.frequency-card{
+
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.08);
+
+}
+
+
+
+.frequency-card h2{
+
+    margin-bottom:10px;
+
+}
+
+
+
+.frequency-table{
+
+    width:100%;
+    margin-top:25px;
+    border-collapse:collapse;
+
+}
+
+
+
+.frequency-table th{
+
+    background:#111827;
+    color:white;
+    padding:15px;
+    text-align:left;
+
+}
+
+
+
+.frequency-table td{
+
+    padding:15px;
+    border-bottom:1px solid #ddd;
+
+}
+
+
+
+.save-button{
+
+    background:#6C63FF;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:10px;
+    cursor:pointer;
+
+}

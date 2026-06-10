@@ -1,55 +1,81 @@
-import { Link } from "react-router-dom"
+import { NavLink } from "react-router-dom"
 
 function Sidebar() {
+
   return (
+
     <div className="sidebar">
+
 
       <h2 className="logo">
         PresenSee
       </h2>
 
+
       <ul className="menu">
 
+
         <li>
-          <Link to="/dashboard">
+          <NavLink to="/dashboard">
             📊 Dashboard
-          </Link>
+          </NavLink>
         </li>
 
+
         <li>
-          <Link to="/alunos">
+          <NavLink to="/alunos">
             👨‍🎓 Alunos
-          </Link>
+          </NavLink>
         </li>
 
+
         <li>
-          <Link to="/turmas">
+          <NavLink to="/novo-aluno">
+            ➕ Cadastrar Aluno
+          </NavLink>
+        </li>
+
+
+        <li>
+          <NavLink to="/turmas">
             🏫 Turmas
-          </Link>
+          </NavLink>
         </li>
 
+
         <li>
-          <Link to="/frequencia">
+          <NavLink to="/frequencia">
             📅 Frequência
-          </Link>
+          </NavLink>
         </li>
 
+
         <li>
-          <Link to="/alertas">
+          <NavLink to="/alertas">
             ⚠️ Alertas
-          </Link>
+          </NavLink>
+        </li>
+
+
+        <li>
+          <NavLink to="/relatorios">
+            📑 Relatórios
+          </NavLink>
         </li>
 
         <li>
-          <Link to="/relatorios">
-            📑 Relatórios
-          </Link>
+            🚪 Sair
         </li>
+
 
       </ul>
 
+
     </div>
+
   )
+
 }
+
 
 export default Sidebar

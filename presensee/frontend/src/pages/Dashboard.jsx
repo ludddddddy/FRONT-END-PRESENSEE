@@ -3,6 +3,26 @@ import { useEffect, useState } from "react"
 import api from "../services/api"
 
 function Dashboard() {
+  const [dados,setDados] = useState(null)
+
+
+useEffect(()=>{
+
+api.get("/dashboard/resumo")
+
+.then(response=>{
+
+setDados(response.data)
+
+})
+
+.catch(error=>{
+
+console.log(error)
+
+})
+
+},[])
   return (
     <DashboardLayout>
 
@@ -54,9 +74,8 @@ function Dashboard() {
           </h3>
 
           <p>
-            120
+            {dados?.totalAlunos}
           </p>
-
         </div>
 
 
@@ -68,7 +87,7 @@ function Dashboard() {
           </h3>
 
           <p>
-            12
+            {dados?.alunosRisco}
           </p>
 
         </div>
@@ -82,7 +101,7 @@ function Dashboard() {
           </h3>
 
           <p>
-            87%
+            {dados?.taxaFrequenciaGeral}%
           </p>
 
         </div>
@@ -96,7 +115,7 @@ function Dashboard() {
           </h3>
 
           <p>
-            5
+            {dados?.alertasAbertos}
           </p>
 
         </div>

@@ -1,4 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom"
+import { logout } from "../services/auth"
 
 function Sidebar() {
 
@@ -7,8 +8,7 @@ function Sidebar() {
 
   function handleLogout() {
 
-    localStorage.removeItem("token")
-    localStorage.removeItem("usuario")
+    logout()
 
     navigate("/login")
 

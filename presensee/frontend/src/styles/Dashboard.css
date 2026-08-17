@@ -278,3 +278,15 @@
 
   text-transform: capitalize;
 }
+
+.dashboard-error{
+  background: white;
+
+  padding: 20px;
+
+  border-radius: 10px;
+
+  color: #b91c1c;
+
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}

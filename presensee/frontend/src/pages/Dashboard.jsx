@@ -1,42 +1,120 @@
 import DashboardLayout from "../layouts/DashboardLayout"
 import { useEffect, useState } from "react"
 import api from "../services/api"
+import { getUsuario, getToken } from "../services/auth"
+
 
 function Dashboard() {
-  const [dados,setDados] = useState(null)
+
+  const [dados, setDados] = useState(null)
   const [usuario, setUsuario] = useState(null)
+  const [carregando, setCarregando] = useState(true)
+  const [erro, setErro] = useState("")
+
+  const alertas = [
+    {
+      aluno: "Gabriel Soares",
+      motivo: "4 faltas consecutivas"
+    },
+
+    {
+      aluno: "Pedro Henrique",
+      motivo: "27% de faltas"
+    },
+
+    {
+      aluno: "Miguel Augusto",
+      motivo: "Risco de evasão escolar"
+    }
+  ]
 
   
+
+
+  useEffect(() => {
+
+    setUsuario(getUsuario())
+  
+
+  }, [])
+
+
 useEffect(() => {
 
-  const usuarioSalvo = localStorage.getItem("usuario")
+  const token = getToken()
 
-  if (usuarioSalvo) {
 
-    setUsuario(JSON.parse(usuarioSalvo))
+  if (token === "demo-token") {
 
+    setDados({
+      totalAlunos: 120,
+      alunosRisco: 12,
+      taxaFrequenciaGeral: 87,
+      alertasAbertos: 5
+    })
+
+    setCarregando(false)
+
+    return
   }
+
+
+  api.get("/dashboard/resumo")
+
+    .then(response => {
+
+      setDados(response.data)
+
+      setCarregando(false)
+
+    })
+
+    .catch(error => {
+
+      console.log(error)
+
+      setErro("Não foi possível carregar os dados do dashboard.")
+
+      setCarregando(false)
+
+    })
 
 }, [])
 
-useEffect(()=>{
 
-api.get("/dashboard/resumo")
+  if (carregando) {
 
-.then(response=>{
+    return (
+      <DashboardLayout>
 
-setDados(response.data)
+        <p>
+          Carregando dashboard...
+        </p>
 
-})
+      </DashboardLayout>
+    )
 
-.catch(error=>{
+  }
 
-console.log(error)
+  if (erro) {
 
-})
-
-},[])
   return (
+    <DashboardLayout>
+
+      <div className="dashboard-error">
+
+        ⚠️ {erro}
+
+      </div>
+
+    </DashboardLayout>
+  )
+
+}
+
+
+  return (
+
     <DashboardLayout>
 
 
@@ -55,21 +133,20 @@ console.log(error)
         </div>
 
 
-      <div className="user-info">
+        <div className="user-info">
 
-      <strong>
-        {usuario?.nome}
-      </strong>
+          <strong>
+            {usuario?.nome}
+          </strong>
 
-      <span>
-        {usuario?.perfil}
-      </span>
+          <span>
+            {usuario?.perfil}
+          </span>
 
-</div>
+        </div>
 
 
       </div>
-
 
 
       <div className="system-status">
@@ -79,8 +156,6 @@ console.log(error)
         </p>
 
       </div>
-
-
 
 
       <div className="cards-container">
@@ -95,8 +170,8 @@ console.log(error)
           <p>
             {dados?.totalAlunos}
           </p>
-        </div>
 
+        </div>
 
 
         <div className="card">
@@ -112,7 +187,6 @@ console.log(error)
         </div>
 
 
-
         <div className="card">
 
           <h3>
@@ -124,7 +198,6 @@ console.log(error)
           </p>
 
         </div>
-
 
 
         <div className="card">
@@ -143,46 +216,35 @@ console.log(error)
       </div>
 
 
-
-
       <div className="alerts-section">
-
 
         <h2>
           Últimos Alertas
         </h2>
 
 
+       {
+       alertas.map((alerta, index) => (
 
-        <div className="alert-item">
+    <div
+      className="alert-item"
+      key={index}
+    >
 
-          ⚠️ Gabriel Soares atingiu 4 faltas consecutivas
+      ⚠️ {alerta.aluno} — {alerta.motivo}
 
-        </div>
+    </div>
 
-
-
-        <div className="alert-item">
-
-          ⚠️ Pedro Henrique está com 27% de faltas
-
-        </div>
-
-
-
-        <div className="alert-item">
-
-          ⚠️ Miguel Augusto está com risco de evasão
-
-        </div>
-
+  ))
+}
 
       </div>
 
 
-
     </DashboardLayout>
+
   )
+
 }
 
 export default Dashboard

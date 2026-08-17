@@ -76,10 +76,11 @@
   padding: 20px;
 
   flex-shrink: 0;
-}
 
-body {
-  margin: 0;
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
 }
 .content{
   flex: 1;
@@ -154,24 +155,35 @@ body {
   border-bottom: 1px solid #eee;
 }
 
+.menu{
+  list-style: none;
+
+  padding: 0;
+  margin: 30px 0 0 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
 .menu a{
+  color: white;
 
-    color:white;
+  text-decoration: none;
 
-    text-decoration:none;
+  display: block;
 
-    display:block;
+  padding: 10px;
 
+  border-radius: 8px;
+
+  transition: 0.2s;
 }
 
 
-
 .menu a.active{
-
-    background:#6C63FF;
-    padding:10px;
-    border-radius:8px;
-
+  background: #6C63FF;
+  color: white;
 }
 
 .system-status{
@@ -186,6 +198,10 @@ body {
 
     box-shadow:0 4px 10px rgba(0,0,0,0.05);
 
+}
+
+.menu a:hover{
+  background: rgba(108, 99, 255, 0.25);
 }
 
 @media(max-width:900px){
@@ -204,4 +220,61 @@ body {
     }
 
 
+}
+
+.logout-button{
+  margin-top: auto;
+
+  width: 100%;
+
+  padding: 12px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: #6C63FF;
+
+  color: white;
+
+  font-size: 16px;
+
+  cursor: pointer;
+
+  text-align: left;
+
+  transition: 0.2s;
+}
+
+.logout-button:hover{
+  background: #574fd6;
+}
+
+.user-info{
+  background: white;
+
+  padding: 12px 20px;
+
+  border-radius: 10px;
+
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+
+.user-info strong{
+  color: #111827;
+}
+
+
+.user-info span{
+  color: #6C63FF;
+
+  font-size: 13px;
+
+  text-transform: capitalize;
 }

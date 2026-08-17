@@ -9,28 +9,80 @@ import Relatorios from "./pages/Relatorios"
 import Turmas from "./pages/Turmas"
 import NovoAluno from "./pages/NovoAluno"
 
+import ProtectedRoute from "./components/ProtectedRoute"
+
 function App() {
   return (
     <BrowserRouter>
 
       <Routes>
-        <Route path="/alunos" element={<Alunos />} />
 
-        <Route path="/login" element={<Login />} />
-
-        <Route path="/Alertas" element={<Alertas />} />
-
-        <Route path="/Turmas" element={<Turmas />} />
-
-        <Route path="/Frequencia" element={<Frequencia />} />
-
-        <Route path="/Relatorios" element={<Relatorios />} />
-
-        <Route path="/novo-aluno" element={<NovoAluno />} />
+        <Route
+          path="/login"
+          element={<Login />}
+        />
 
         <Route
           path="/dashboard"
-          element={<Dashboard />}
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/alunos"
+          element={
+            <ProtectedRoute>
+              <Alunos />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/novo-aluno"
+          element={
+            <ProtectedRoute>
+              <NovoAluno />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/turmas"
+          element={
+            <ProtectedRoute>
+              <Turmas />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/frequencia"
+          element={
+            <ProtectedRoute>
+              <Frequencia />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/alertas"
+          element={
+            <ProtectedRoute>
+              <Alertas />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/relatorios"
+          element={
+            <ProtectedRoute>
+              <Relatorios />
+            </ProtectedRoute>
+          }
         />
 
       </Routes>

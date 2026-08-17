@@ -4,7 +4,20 @@ import api from "../services/api"
 
 function Dashboard() {
   const [dados,setDados] = useState(null)
+  const [usuario, setUsuario] = useState(null)
 
+  
+useEffect(() => {
+
+  const usuarioSalvo = localStorage.getItem("usuario")
+
+  if (usuarioSalvo) {
+
+    setUsuario(JSON.parse(usuarioSalvo))
+
+  }
+
+}, [])
 
 useEffect(()=>{
 
@@ -42,11 +55,17 @@ console.log(error)
         </div>
 
 
-        <div className="user-info">
+      <div className="user-info">
 
-          Secretaria
+      <strong>
+        {usuario?.nome}
+      </strong>
 
-        </div>
+      <span>
+        {usuario?.perfil}
+      </span>
+
+</div>
 
 
       </div>

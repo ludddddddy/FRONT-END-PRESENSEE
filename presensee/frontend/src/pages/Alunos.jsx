@@ -1,10 +1,14 @@
 import DashboardLayout from "../layouts/DashboardLayout"
 import "../styles/Alunos.css"
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 function Alunos() {
+
   const navigate = useNavigate()
-  const alunos = [
+
+
+  const [alunos, setAlunos] = useState([
     {
       nome: "Gabriel Soares",
       matricula: "001",
@@ -25,8 +29,56 @@ function Alunos() {
       turma: "3º Ano A",
       situacao: "Em risco"
     }
-  ]
+  ])
 
+
+  const [alunoEditando, setAlunoEditando] = useState(null)
+
+
+  function editarAluno(aluno) {
+
+    setAlunoEditando(aluno)
+
+  }
+
+
+  function salvarEdicao() {
+
+    setAlunos(
+
+      alunos.map((aluno) => {
+
+        if (aluno.matricula === alunoEditando.matricula) {
+
+          return alunoEditando
+
+        }
+
+        return aluno
+
+      })
+
+    )
+
+    setAlunoEditando(null)
+
+  }
+
+  function excluirAluno(matricula) {
+
+  const confirmar = window.confirm(
+    "Tem certeza que deseja excluir este aluno?"
+  )
+
+  if (!confirmar) {
+    return
+  }
+
+  setAlunos(
+    alunos.filter((aluno) => aluno.matricula !== matricula)
+  )
+
+}
 
   return (
 
@@ -40,9 +92,9 @@ function Alunos() {
         </h1>
 
 
-        <button 
-           className="add-button"
-           onClick={() => navigate("/novo-aluno")}
+        <button
+          className="add-button"
+          onClick={() => navigate("/novo-aluno")}
         >
 
           + Novo Aluno
@@ -52,6 +104,98 @@ function Alunos() {
 
       </div>
 
+
+      {
+        alunoEditando && (
+
+          <div className="edit-form">
+
+            <h2>
+              Editar aluno
+            </h2>
+
+
+            <input
+              type="text"
+              value={alunoEditando.nome}
+              onChange={(e) =>
+                setAlunoEditando({
+                  ...alunoEditando,
+                  nome: e.target.value
+                })
+              }
+            />
+
+
+            <input
+              type="text"
+              value={alunoEditando.matricula}
+              onChange={(e) =>
+                setAlunoEditando({
+                  ...alunoEditando,
+                  matricula: e.target.value
+                })
+              }
+            />
+
+
+            <input
+              type="text"
+              value={alunoEditando.turma}
+              onChange={(e) =>
+                setAlunoEditando({
+                  ...alunoEditando,
+                  turma: e.target.value
+                })
+              }
+            />
+
+
+            <select
+              value={alunoEditando.situacao}
+              onChange={(e) =>
+                setAlunoEditando({
+                  ...alunoEditando,
+                  situacao: e.target.value
+                })
+              }
+            >
+
+              <option value="Ativo">
+                Ativo
+              </option>
+
+              <option value="Em risco">
+                Em risco
+              </option>
+
+            </select>
+
+
+            <button
+              className="save-button"
+              onClick={salvarEdicao}
+            >
+
+              Salvar
+
+            </button>
+
+
+            <button
+              className="cancel-button"
+              onClick={() => setAlunoEditando(null)}
+            >
+
+              Cancelar
+
+            </button>
+
+
+          </div>
+
+        )
+      }
 
 
       <table className="students-table">
@@ -81,66 +225,63 @@ function Alunos() {
               Ações
             </th>
 
-
           </tr>
 
         </thead>
 
 
-
         <tbody>
 
+          {
+            alunos.map((aluno, index) => (
 
-        {alunos.map((aluno,index)=>(
+              <tr key={index}>
 
+                <td>
+                  {aluno.nome}
+                </td>
 
-          <tr key={index}>
+                <td>
+                  {aluno.matricula}
+                </td>
 
+                <td>
+                  {aluno.turma}
+                </td>
 
-            <td>
-              {aluno.nome}
-            </td>
+                <td>
+                  {aluno.situacao}
+                </td>
 
+                <td>
 
-            <td>
-              {aluno.matricula}
-            </td>
+                  <button
+                    className="edit-button"
+                    onClick={() => editarAluno(aluno)}
+                  >
 
+                    Editar
 
-            <td>
-              {aluno.turma}
-            </td>
-
-
-            <td>
-              {aluno.situacao}
-            </td>
-
-
-            <td>
-
-
-              <button className="edit-button">
-                Editar
-              </button>
+                  </button>
 
 
-              <button className="delete-button">
-                Excluir
-              </button>
+                  <button
+                    className="delete-button"
+                   onClick={() => excluirAluno(aluno.matricula)}
+                  >
 
+                    Excluir
 
-            </td>
+                  </button>
 
+                </td>
 
-          </tr>
+              </tr>
 
-
-        ))}
-
+            ))
+          }
 
         </tbody>
-
 
 
       </table>
@@ -149,6 +290,7 @@ function Alunos() {
     </DashboardLayout>
 
   )
+
 }
 
 

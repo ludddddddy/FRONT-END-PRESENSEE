@@ -1,389 +1,292 @@
-import { useState } from "react"
-import { Link, useParams } from "react-router-dom"
-import DashboardLayout from "../layouts/DashboardLayout"
-import GaugeChart from "../components/GaugeChart"
-import ExpandButton from "../components/ExpandButton"
-import {
-  alunos,
-  intervencoes as intervencoesMock,
-  TIPOS_INTERVENCAO,
-  formatarData,
-  dataHoje,
-  nivelRisco
-} from "../data/diarioMock"
-import "../styles/Diario.css"
+import React, { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import DashboardLayout from "../layouts/DashboardLayout";
+import GaugeChart from "../components/GaugeChart";
+import AlunoModal from "../components/AlunoModal";
+import { alunos, intervencoes as intervencoesMock, TIPOS_INTERVENCAO, formatarData, dataHoje } from "../data/diarioMock";
+import "../styles/Diario.css";
 
-function corFrequencia(valor) {
-  if (valor < 75) return "#ff0000"
-  if (valor < 90) return "#e5b500"
-  return "#22c55e"
-}
+export default function AlunoPerfil() {
+  const { id } = useParams();
 
-function AlunoPerfil() {
+  // Seleciona o aluno do mock (pelo ID da URL ou seleciona Cirilo Santos)
+  const aluno = alunos.find((a) => String(a.id) === String(id)) || alunos[0];
 
-  const { id } = useParams()
+  // Modais de Controle
+  const [modalDadosAberto, setModalDadosAberto] = useState(false);
+  const [modalNovaIntervencao, setModalNovaIntervencao] = useState(false);
+  const [modalHistorico, setModalHistorico] = useState(false);
 
-  const aluno = alunos.find(item => item.id === Number(id))
+  // Lista local de intervenções (permite adicionar novas dinamicamente)
+  const [listaIntervencoes, setListaIntervencoes] = useState(intervencoesMock);
 
+  // Formulário de Nova Intervenção
+  const [novoTipo, setNovoTipo] = useState(TIPOS_INTERVENCAO[0]);
+  const [novaDescricao, setNovaDescricao] = useState("");
 
-  const [intervencoes, setIntervencoes] = useState(
-    intervencoesMock.filter(item => item.alunoId === Number(id))
-  )
+  // Pendências mapeadas a partir das strings do mock
+  const [pendencias, setPendencias] = useState([]);
 
-  const [pendencias, setPendencias] = useState(
-    (aluno?.pendencias || []).map(texto => ({ texto, feita: false }))
-  )
+  // Atualiza as pendências sempre que o aluno mudar
+  useEffect(() => {
+    if (aluno && aluno.pendencias) {
+      setPendencias(
+        aluno.pendencias.map((p, idx) => ({ id: idx + 1, texto: p, concluida: false }))
+      );
+    }
+  }, [aluno]);
 
-  const [dadosAberto, setDadosAberto] = useState(false)
-  const [historicoAberto, setHistoricoAberto] = useState(false)
-  const [modalAberto, setModalAberto] = useState(false)
+  // Intervenções filtradas do aluno
+  const intervencoesDoAluno = listaIntervencoes.filter((i) => i.alunoId === aluno.id);
+  const ultimaIntervencao = intervencoesDoAluno[0] || null;
 
-  const [tipo, setTipo] = useState(TIPOS_INTERVENCAO[0])
-  const [descricao, setDescricao] = useState("")
+  // Toggle de Checkbox das Pendências
+  const togglePendencia = (pendenciaId) => {
+    setPendencias((prev) =>
+      prev.map((p) => (p.id === pendenciaId ? { ...p, concluida: !p.concluida } : p))
+    );
+  };
 
-
-  if (!aluno) {
-
-    return (
-
-      <DashboardLayout>
-
-        <div className="page-header">
-          <h1>Aluno não encontrado</h1>
-        </div>
-
-        <Link to="/diario" className="diario-link-aluno">
-          Voltar para o Diário do Monitor
-        </Link>
-
-      </DashboardLayout>
-
-    )
-
-  }
-
-
-  const ultima = intervencoes[0]
-
-
-  function alternarPendencia(indice) {
-
-    setPendencias(lista =>
-      lista.map((item, i) =>
-        i === indice ? { ...item, feita: !item.feita } : item
-      )
-    )
-
-  }
-
-
-  function fecharModal() {
-
-    setModalAberto(false)
-    setTipo(TIPOS_INTERVENCAO[0])
-    setDescricao("")
-
-  }
-
-
-  function salvarIntervencao(e) {
-
-    e.preventDefault()
+  // Salvar Nova Intervenção
+  const handleSalvarIntervencao = (e) => {
+    e.preventDefault();
+    if (!novaDescricao.trim()) return;
 
     const nova = {
       id: Date.now(),
       alunoId: aluno.id,
-      tipo,
+      tipo: novoTipo,
       data: dataHoje(),
-      descricao: descricao.trim()
-    }
+      descricao: novaDescricao,
+    };
 
-    setIntervencoes(lista => [nova, ...lista])
-
-    fecharModal()
-
-  }
-
+    setListaIntervencoes([nova, ...listaIntervencoes]);
+    setNovaDescricao("");
+    setModalNovaIntervencao(false);
+  };
 
   return (
-
     <DashboardLayout>
+      <div className="perfil-aluno-container">
+        
+      <div className="perfil-voltar-container">
+    <Link to="/diario" className="btn-voltar">
+      ← Voltar para o Diário
+    </Link>
+  </div>
 
-      <div className="perfil-page">
-
-
-        {/* LINHA 1: FICHA + FREQUÊNCIA + FALTAS */}
-
-        <div className="perfil-linha perfil-linha-topo">
-
-
-          <div className="perfil-ficha">
-
-            <div className="perfil-ficha-topo">
-
-              <div className="perfil-foto"></div>
-
-              <div>
-                <h1>{aluno.nome}</h1>
-                <p>{aluno.turma}</p>
+        {/* GRID SUPERIOR */}
+        <div className="perfil-grid-top">
+          
+          {/* Card 1: Informações do Aluno */}
+          <div className="perfil-card perfil-card-info">
+            <div className="perfil-header-info">
+              <div className="perfil-avatar-placeholder"></div>
+              <div className="perfil-nome-turma">
+                <h2>{aluno.nome}</h2>
+                <span>{aluno.turma}</span>
               </div>
-
             </div>
 
-
-            <div className="perfil-status">
-
-              <div>
-                <span className={`risk-dot ${nivelRisco(aluno.risco)}`}></span>
+            <div className="perfil-status-tags">
+              <div className="status-item red">
+                <span className="dot red-dot"></span>
                 {aluno.status}
               </div>
-
-              <div>
-                <span className={`risk-dot ${nivelRisco(aluno.risco)}`}></span>
+              <div className="status-item red">
+                <span className="dot red-dot"></span>
                 Risco Atual: {aluno.risco}%
               </div>
-
             </div>
 
-
-            <ExpandButton
-              label="Dados do Aluno"
-              small
-              aberto={dadosAberto}
-              onClick={() => setDadosAberto(!dadosAberto)}
-            />
-
-            {dadosAberto && (
-
-              <dl className="perfil-dados">
-
-                <dt>Matrícula</dt>
-                <dd>{aluno.matricula}</dd>
-
-                <dt>Email</dt>
-                <dd>{aluno.email}</dd>
-
-                <dt>Responsável</dt>
-                <dd>{aluno.responsaveis.map(r => r.nome).join(", ")}</dd>
-
-              </dl>
-
-            )}
-
-          </div>
-
-
-          <div className="card-branco perfil-card-gauge">
-
-            <h2>Frequência</h2>
-
-            <div className="perfil-gauge">
-              <GaugeChart
-                value={aluno.frequencia}
-                color={corFrequencia(aluno.frequencia)}
-              />
+            <div className="perfil-dropdown-container">
+              <button 
+                type="button"
+                className="btn-purple-dropdown" 
+                onClick={() => setModalDadosAberto(true)}
+              >
+                Dados do Aluno
+                <span className="chevron">▾</span>
+              </button>
             </div>
-
           </div>
 
-
-          <div className="card-branco perfil-card-faltas">
-
-            <h2>Faltas</h2>
-
-            <strong>{aluno.faltas}</strong>
-
+          {/* Card 2: Frequência com Gráfico */}
+          <div className="perfil-card card-gauge">
+            <h3>Frequência</h3>
+            <div className="gauge-wrapper" style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+              <GaugeChart value={aluno.frequencia} />
+            </div>
           </div>
 
+          {/* Card 3: Faltas */}
+          <div className="perfil-card card-faltas">
+            <h3>Faltas</h3>
+            <div className="stat-number">{aluno.faltas}</div>
+          </div>
 
         </div>
 
+        {/* GRID INTERMEDIÁRIO */}
+        <div className="perfil-grid-middle">
+          
+          {/* Card 4: Quantidade de Intervenções */}
+          <div className="perfil-card card-intervencoes">
+            <div className="card-top-row">
+              <h3>Quantidade de Intervenções</h3>
+              <span className="stat-number-small">{intervencoesDoAluno.length}</span>
+            </div>
+            
+            <button 
+              type="button"
+              className="btn-purple-action"
+              onClick={() => setModalNovaIntervencao(true)}
+            >
+              Nova intervenção <span className="plus-icon">+</span>
+            </button>
+          </div>
 
-        {/* LINHA 2: INTERVENÇÕES */}
-
-        <div className="perfil-linha perfil-linha-meio">
-
-
-          <div className="card-branco perfil-card-quantidade">
-
-            <div className="perfil-card-titulo-linha">
-
-              <h2>Quantidade de Intervenções</h2>
-
-              <strong>{intervencoes.length}</strong>
-
+          {/* Card 5: Última Intervenção */}
+          <div className="perfil-card card-ultima-intervencao">
+            <h3>Última intervenção</h3>
+            <div className="intervencao-detalhe">
+              {ultimaIntervencao ? (
+                <>
+                  <strong>{formatarData(ultimaIntervencao.data)}</strong>
+                  <p>
+                    <span className="highlight-purple">{ultimaIntervencao.tipo}</span> - {ultimaIntervencao.descricao}
+                  </p>
+                </>
+              ) : (
+                <p>Nenhuma intervenção registrada.</p>
+              )}
             </div>
 
-            <ExpandButton
-              label="Nova intervenção"
-              icone="plus"
-              small
-              onClick={() => setModalAberto(true)}
-            />
-
+            <button 
+              type="button" 
+              className="btn-purple-dropdown full-width"
+              onClick={() => setModalHistorico(true)}
+            >
+              Ver todas as informações
+              <span className="chevron">▾</span>
+            </button>
           </div>
-
-
-          <div className="card-branco perfil-card-ultima">
-
-            <h2>Última intervenção</h2>
-
-            {ultima ? (
-
-              <>
-
-                <p className="perfil-ultima-data">
-                  {formatarData(ultima.data)}
-                </p>
-
-                <p>
-                  <span className="perfil-tipo">{ultima.tipo}</span> com o aluno
-                </p>
-
-              </>
-
-            ) : (
-
-              <p className="diario-vazio">
-                Nenhuma intervenção registrada.
-              </p>
-
-            )}
-
-            <ExpandButton
-              label="Ver todas as informações"
-              small
-              aberto={historicoAberto}
-              onClick={() => setHistoricoAberto(!historicoAberto)}
-            />
-
-            {historicoAberto && (
-
-              <ul className="diario-lista perfil-historico">
-
-                {intervencoes.map(item => (
-
-                  <li key={item.id}>
-                    <span>
-                      <strong>{item.tipo}</strong>
-                      {item.descricao && ` — ${item.descricao}`}
-                    </span>
-                    <small>{formatarData(item.data)}</small>
-                  </li>
-
-                ))}
-
-              </ul>
-
-            )}
-
-          </div>
-
 
         </div>
 
-
-        {/* PENDÊNCIAS */}
-
-        <section className="perfil-pendencias">
-
-          <h2>Pendências</h2>
-
-          {pendencias.length > 0 ? (
-
-            <div className="perfil-pendencias-lista">
-
-              {pendencias.map((item, indice) => (
-
-                <label key={item.texto} className={item.feita ? "feita" : ""}>
-
-                  <input
-                    type="checkbox"
-                    checked={item.feita}
-                    onChange={() => alternarPendencia(indice)}
+        {/* SEÇÃO INFERIOR: Pendências */}
+        <div className="perfil-pendencias-secao">
+          <div className="pendencias-header">
+            <h2>Pendências</h2>
+          </div>
+          <div className="pendencias-list">
+            {pendencias.length > 0 ? (
+              pendencias.map((item) => (
+                <label key={item.id} className={`pendencia-item ${item.concluida ? 'concluida' : ''}`}>
+                  <input 
+                    type="checkbox" 
+                    checked={item.concluida} 
+                    onChange={() => togglePendencia(item.id)}
                   />
-
-                  {item.texto}
-
+                  <span className="checkbox-custom"></span>
+                  <span className="pendencia-texto">{item.texto}</span>
                 </label>
-
-              ))}
-
-            </div>
-
-          ) : (
-
-            <p className="diario-vazio">
-              Nenhuma pendência para este aluno.
-            </p>
-
-          )}
-
-        </section>
-
+              ))
+            ) : (
+              <p style={{ color: "#888", fontStyle: "italic", padding: "10px" }}>Nenhuma pendência para este aluno.</p>
+            )}
+          </div>
+        </div>
 
       </div>
 
-
-      {/* MODAL: NOVA INTERVENÇÃO */}
-
-      {modalAberto && (
-
-        <div className="interv-overlay" onClick={fecharModal}>
-
-          <form
-            className="interv-modal"
-            onClick={(e) => e.stopPropagation()}
-            onSubmit={salvarIntervencao}
-          >
-
-            <h2>Nova intervenção</h2>
-
-            <label htmlFor="interv-tipo">Tipo</label>
-
-            <select
-              id="interv-tipo"
-              value={tipo}
-              onChange={(e) => setTipo(e.target.value)}
-            >
-              {TIPOS_INTERVENCAO.map(item => (
-                <option key={item} value={item}>{item}</option>
-              ))}
-            </select>
-
-            <label htmlFor="interv-descricao">Descrição</label>
-
-            <textarea
-              id="interv-descricao"
-              rows={4}
-              value={descricao}
-              onChange={(e) => setDescricao(e.target.value)}
-              placeholder="O que foi conversado ou combinado"
-            />
-
-            <div className="interv-acoes">
-
-              <button type="button" className="interv-cancelar" onClick={fecharModal}>
-                Cancelar
-              </button>
-
-              <button type="submit" className="interv-salvar">
-                Salvar intervenção
-              </button>
-
-            </div>
-
-          </form>
-
-        </div>
-
+      {/* MODAL 1: Dados do Aluno */}
+      {modalDadosAberto && (
+        <AlunoModal aluno={aluno} onClose={() => setModalDadosAberto(false)} />
       )}
 
+      {/* MODAL 2: Criar Nova Intervenção */}
+      {modalNovaIntervencao && (
+        <div className="perfil-modal-overlay" onClick={() => setModalNovaIntervencao(false)}>
+          <div className="perfil-modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="perfil-modal-header">
+              <h2>Nova Intervenção - {aluno.nome}</h2>
+              <button className="perfil-modal-close" onClick={() => setModalNovaIntervencao(false)}>✕</button>
+            </div>
+            <form onSubmit={handleSalvarIntervencao} style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "16px" }}>
+              <div>
+                <label style={{ display: "block", marginBottom: "6px", fontWeight: "600" }}>Tipo de Intervenção:</label>
+                <select 
+                  value={novoTipo} 
+                  onChange={(e) => setNovoTipo(e.target.value)}
+                  style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ccc" }}
+                >
+                  {TIPOS_INTERVENCAO.map((tipo) => (
+                    <option key={tipo} value={tipo}>{tipo}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: "block", marginBottom: "6px", fontWeight: "600" }}>Descrição / Observações:</label>
+                <textarea 
+                  rows="4"
+                  value={novaDescricao}
+                  onChange={(e) => setNovaDescricao(e.target.value)}
+                  placeholder="Descreva o que foi tratado durante a intervenção..."
+                  required
+                  style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ccc", resize: "none" }}
+                />
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "10px" }}>
+                <button 
+                  type="button" 
+                  onClick={() => setModalNovaIntervencao(false)}
+                  style={{ padding: "10px 16px", borderRadius: "8px", border: "1px solid #ccc", background: "none", cursor: "pointer" }}
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit"
+                  className="btn-purple-action"
+                  style={{ width: "auto" }}
+                >
+                  Salvar Intervenção
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3: Histórico Completo de Intervenções */}
+      {modalHistorico && (
+        <div className="perfil-modal-overlay" onClick={() => setModalHistorico(false)}>
+          <div className="perfil-modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="perfil-modal-header">
+              <h2>Histórico de Intervenções ({intervencoesDoAluno.length}) - {aluno.nome}</h2>
+              <button className="perfil-modal-close" onClick={() => setModalHistorico(false)}>✕</button>
+            </div>
+            <div style={{ padding: "20px", maxHeight: "400px", overflowY: "auto" }}>
+              {intervencoesDoAluno.length > 0 ? (
+                intervencoesDoAluno.map((item) => (
+                  <div key={item.id} style={{ padding: "12px 0", borderBottom: "1px solid #eee" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                      <strong style={{ color: "#6c47ff" }}>{item.tipo}</strong>
+                      <span style={{ fontSize: "12px", color: "#666" }}>{formatarData(item.data)}</span>
+                    </div>
+                    <p style={{ margin: 0, fontSize: "14px", color: "#333" }}>{item.descricao}</p>
+                  </div>
+                ))
+              ) : (
+                <p>Nenhuma intervenção registrada para este aluno.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
     </DashboardLayout>
-
-  )
-
+  );
 }
-
-export default AlunoPerfil

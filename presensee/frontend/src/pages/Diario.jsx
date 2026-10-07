@@ -2,7 +2,6 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import DashboardLayout from "../layouts/DashboardLayout"
 import GaugeChart from "../components/GaugeChart"
-import ExpandButton from "../components/ExpandButton"
 import AlunoModal from "../components/AlunoModal"
 import { MascotAvatar } from "../components/Icons"
 import {
@@ -20,105 +19,266 @@ function nomeDoAluno(id) {
   return alunos.find(aluno => aluno.id === id)?.nome
 }
 
+function DiarioModal({ tipo, onClose, onAlunoClick }) {
+  const titulos = {
+    intervencoes: "Intervenções",
+    turmas: "Turmas",
+    alunos: "Alunos",
+    anotacoes: "Anotações"
+  }
+
+  return (
+    <div className="diario-modal-overlay" onClick={onClose}>
+      <div
+        className="diario-modal"
+        onClick={event => event.stopPropagation()}
+      >
+        <div className="diario-modal-header">
+          <h2>{titulos[tipo]}</h2>
+
+          <button
+            type="button"
+            className="diario-modal-fechar"
+            onClick={onClose}
+            aria-label="Fechar"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="diario-modal-conteudo">
+
+          {tipo === "intervencoes" && (
+            <>
+              {intervencoes.length > 0 ? (
+                <div className="diario-modal-lista">
+                  {intervencoes.map(intervencao => (
+                    <div
+                      className="diario-modal-item"
+                      key={intervencao.id}
+                    >
+                      <div className="diario-modal-item-topo">
+                        <strong>
+                          {nomeDoAluno(intervencao.alunoId)}
+                        </strong>
+
+                        <small>
+                          {formatarData(intervencao.data)}
+                        </small>
+                      </div>
+
+                      <span className="diario-modal-tag">
+                        {intervencao.tipo}
+                      </span>
+
+                      <p>{intervencao.descricao}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="diario-vazio">
+                  Nenhuma intervenção registrada.
+                </p>
+              )}
+            </>
+          )}
+
+          {tipo === "turmas" && (
+            <>
+              {turmas.length > 0 ? (
+                <div className="diario-modal-lista">
+                  {turmas.map(turma => (
+                    <div
+                      className="diario-modal-item"
+                      key={turma.nome}
+                    >
+                      <div className="diario-modal-item-topo">
+                        <strong>{turma.nome}</strong>
+
+                        <small>
+                          {turma.risco}% de risco
+                        </small>
+                      </div>
+
+                      <p>
+                        {turma.alunos} alunos matriculados
+                      </p>
+
+                      <div className="diario-turma-risco">
+                        <span>Risco de evasão</span>
+
+                        <strong>
+                          {turma.risco}%
+                        </strong>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="diario-vazio">
+                  Nenhuma turma cadastrada.
+                </p>
+              )}
+            </>
+          )}
+
+          {tipo === "alunos" && (
+            <>
+              {alunos.length > 0 ? (
+                <div className="diario-modal-lista">
+                  {alunos.map(aluno => (
+                    <div
+                      className="diario-modal-item diario-modal-aluno"
+                      key={aluno.id}
+                    >
+                      <div className="diario-modal-item-topo">
+                        <div className="diario-modal-aluno-nome">
+                          <span
+                            className={`risk-dot ${nivelRisco(aluno.risco)}`}
+                          ></span>
+
+                          <strong>{aluno.nome}</strong>
+                        </div>
+
+                        <small>{aluno.turma}</small>
+                      </div>
+
+                      <div className="diario-aluno-resumo">
+                        <div>
+                          <span>Frequência</span>
+                          <strong>{aluno.frequencia}%</strong>
+                        </div>
+
+                        <div>
+                          <span>Risco</span>
+                          <strong>{aluno.risco}%</strong>
+                        </div>
+
+                        <div>
+                          <span>Faltas</span>
+                          <strong>{aluno.faltas}</strong>
+                        </div>
+                      </div>
+
+                      <div className="diario-modal-aluno-acoes">
+                        <button
+                          type="button"
+                          className="diario-ver-dados"
+                          onClick={() => onAlunoClick(aluno)}
+                        >
+                          Ver dados
+                        </button>
+
+                        <Link
+                          to={`/diario/aluno/${aluno.id}`}
+                          className="diario-acompanhar"
+                          onClick={onClose}
+                        >
+                          Acompanhar
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="diario-vazio">
+                  Nenhum aluno cadastrado.
+                </p>
+              )}
+            </>
+          )}
+
+          {tipo === "anotacoes" && (
+            <>
+              {anotacoes.length > 0 ? (
+                <div className="diario-modal-lista">
+                  {anotacoes.map(nota => (
+                    <div
+                      className="diario-modal-item diario-modal-nota"
+                      key={nota.id}
+                    >
+                      <small>{formatarData(nota.data)}</small>
+
+                      <p>{nota.texto}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="diario-vazio">
+                  Nenhuma anotação ainda.
+                </p>
+              )}
+            </>
+          )}
+
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function Diario() {
-
-  // Um bloco aberto por vez
-  const [aberto, setAberto] = useState(null)
-
+  const [modalAberto, setModalAberto] = useState(null)
   const [alunoModal, setAlunoModal] = useState(null)
 
   const avatar = localStorage.getItem("avatarUsuario") || ""
 
-  function alternar(chave) {
-    setAberto(atual => (atual === chave ? null : chave))
+  function abrirModal(tipo) {
+    setModalAberto(tipo)
   }
 
+  function fecharModal() {
+    setModalAberto(null)
+  }
 
-  const secoes = [
+  function abrirAlunoModal(aluno) {
+    setAlunoModal(aluno)
+  }
 
+  const cards = [
     {
       chave: "intervencoes",
-      titulo: "Ver todas as intervenções",
-      vazio: "Nenhuma intervenção registrada.",
-      itens: intervencoes.map(item => (
-        <li key={item.id}>
-          <span>{nomeDoAluno(item.alunoId)} — {item.tipo}</span>
-          <small>{formatarData(item.data)}</small>
-        </li>
-      ))
+      titulo: "Intervenções",
+      descricao: "Consulte todas as intervenções registradas.",
+      quantidade: intervencoes.length,
+      textoQuantidade: "registros"
     },
-
     {
       chave: "turmas",
-      titulo: "Ver todas as turmas",
-      vazio: "Nenhuma turma cadastrada.",
-      itens: turmas.map(turma => (
-        <li key={turma.nome}>
-          <span>{turma.nome} — {turma.alunos} alunos</span>
-          <small>{turma.risco}% de risco</small>
-        </li>
-      ))
+      titulo: "Turmas",
+      descricao: "Visualize as turmas acompanhadas.",
+      quantidade: turmas.length,
+      textoQuantidade: "turmas"
     },
-
     {
       chave: "alunos",
-      titulo: "Ver todos os alunos",
-      vazio: "Nenhum aluno cadastrado.",
-      itens: alunos.map(aluno => (
-        <li key={aluno.id}>
-          <span className="diario-aluno">
-            <span className={`risk-dot ${nivelRisco(aluno.risco)}`}></span>
-            {aluno.nome}
-            <small>{aluno.turma}</small>
-          </span>
-          <button
-              type="button"
-              className="diario-ver-dados"
-              onClick={() => setAlunoModal(aluno)}
-            >
-              Ver dados
-            </button>
-          <Link to={`/diario/aluno/${aluno.id}`} className="diario-acompanhar">
-            Acompanhar
-          </Link>
-        </li>
-      ))
+      titulo: "Alunos",
+      descricao: "Consulte os alunos em acompanhamento.",
+      quantidade: alunos.length,
+      textoQuantidade: "alunos"
     },
-
     {
       chave: "anotacoes",
       titulo: "Anotações",
-      vazio: "Nenhuma anotação ainda.",
-      itens: anotacoes.map(nota => (
-        <li key={nota.id} className="nota">
-          <small>{formatarData(nota.data)}</small>
-          <span>{nota.texto}</span>
-        </li>
-      ))
+      descricao: "Visualize as anotações registradas no diário.",
+      quantidade: anotacoes.length,
+      textoQuantidade: "anotações"
     }
-
   ]
 
-
   return (
-
     <DashboardLayout>
-
       <div className="diario-page">
 
-
         <div className="dashboard-header">
-
           <div className="dashboard-header-left">
 
             <div className="dashboard-avatar diario-avatar">
-
               {avatar ? (
                 <img src={avatar} alt="Foto do usuário" />
               ) : (
                 <MascotAvatar size={72} />
               )}
-
             </div>
 
             <h1>
@@ -126,96 +286,147 @@ function Diario() {
             </h1>
 
           </div>
-
         </div>
-
 
         <div className="diario-grid">
 
-
           <div className="diario-coluna-esquerda">
 
-            <h2 className="diario-total-titulo">
-              Total de Intervenções
-            </h2>
+            <div className="diario-total">
+              <h2 className="diario-total-titulo">
+                Total de Intervenções
+              </h2>
 
-            <strong className="diario-total-valor">
-              {intervencoes.length}
-            </strong>
+              <strong className="diario-total-valor">
+                {intervencoes.length}
+              </strong>
+            </div>
 
+            <div className="diario-cards">
 
-            <div className="diario-acordeoes">
+              {cards
+                .filter(
+                  card =>
+                    card.chave === "intervencoes" ||
+                    card.chave === "turmas"
+                )
+                .map(card => (
+                  <button
+                    type="button"
+                    className="diario-card"
+                    key={card.chave}
+                    onClick={() => abrirModal(card.chave)}
+                  >
+                    <div className="diario-card-conteudo">
+                      <h3>
+                        {card.titulo}
+                      </h3>
 
-              {secoes.map(secao => (
+                      <p>
+                        {card.descricao}
+                      </p>
 
-                <div key={secao.chave}>
+                      <div className="diario-card-quantidade">
+                        <strong>
+                          {card.quantidade}
+                        </strong>
 
-                  <ExpandButton
-                    label={secao.titulo}
-                    aberto={aberto === secao.chave}
-                    onClick={() => alternar(secao.chave)}
-                  />
-
-                  {aberto === secao.chave && (
-
-                    <div className="diario-painel">
-
-                      {secao.itens.length > 0 ? (
-                        <ul className="diario-lista">
-                          {secao.itens}
-                        </ul>
-                      ) : (
-                        <p className="diario-vazio">
-                          {secao.vazio}
-                        </p>
-                      )}
-
+                        <span>
+                          {card.textoQuantidade}
+                        </span>
+                      </div>
                     </div>
 
-                  )}
+                    <span className="diario-card-link">
+                      Ver detalhes
+                      <span>→</span>
+                    </span>
+                  </button>
+                ))}
 
+              <div className="diario-card diario-gauge-card">
+                <div className="diario-card-conteudo">
+                  <h3>
+                    Risco de evasão geral
+                  </h3>
+
+                  <div className="diario-gauge">
+                    <GaugeChart
+                      value={resumoDiario.riscoEvasaoGeral}
+                    />
+                  </div>
                 </div>
+              </div>
 
-              ))}
+              {cards
+                .filter(
+                  card =>
+                    card.chave === "alunos" ||
+                    card.chave === "anotacoes"
+                )
+                .map(card => (
+                  <button
+                    type="button"
+                    className="diario-card"
+                    key={card.chave}
+                    onClick={() => abrirModal(card.chave)}
+                  >
+                    <div className="diario-card-conteudo">
+                      <h3>
+                        {card.titulo}
+                      </h3>
+
+                      <p>
+                        {card.descricao}
+                      </p>
+
+                      <div className="diario-card-quantidade">
+                        <strong>
+                          {card.quantidade}
+                        </strong>
+
+                        <span>
+                          {card.textoQuantidade}
+                        </span>
+                      </div>
+                    </div>
+
+                    <span className="diario-card-link">
+                      Ver detalhes
+                      <span>→</span>
+                    </span>
+                  </button>
+                ))}
+
+              <div className="diario-card diario-gauge-card">
+                <div className="diario-card-conteudo">
+                  <h3>
+                    Seu desempenho
+                  </h3>
+
+                  <div className="diario-gauge">
+                    <GaugeChart
+                      value={resumoDiario.desempenhoMonitor}
+                    />
+                  </div>
+                </div>
+              </div>
 
             </div>
 
           </div>
 
-
-          <div className="diario-coluna-direita">
-
-            <section>
-
-              <h2 className="gauge-titulo">
-                Risco de evasão geral
-              </h2>
-
-              <div className="card-branco gauge-card-diario">
-                <GaugeChart value={resumoDiario.riscoEvasaoGeral} />
-              </div>
-
-            </section>
-
-
-            <section>
-
-              <h2 className="gauge-titulo">
-                Seu desempenho
-              </h2>
-
-              <div className="card-branco gauge-card-diario">
-                <GaugeChart value={resumoDiario.desempenhoMonitor} />
-              </div>
-
-            </section>
-
-          </div>
-
-
         </div>
 
       </div>
+
+      {modalAberto && (
+        <DiarioModal
+          tipo={modalAberto}
+          onClose={fecharModal}
+          onAlunoClick={abrirAlunoModal}
+        />
+      )}
 
       {alunoModal && (
         <AlunoModal
@@ -225,9 +436,7 @@ function Diario() {
       )}
 
     </DashboardLayout>
-
   )
-
 }
 
 export default Diario

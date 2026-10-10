@@ -15,6 +15,7 @@ function Intervencao() {
   const [busca, setBusca] = useState("")
   const [tipoSelecionado, setTipoSelecionado] = useState("Todos")
   const [modalAberto, setModalAberto] = useState(false)
+  const [detalheSelecionado, setDetalheSelecionado] = useState(null)
 
   const [alunoId, setAlunoId] = useState("")
   const [tipo, setTipo] = useState(TIPOS_INTERVENCAO[0])
@@ -65,10 +66,11 @@ function Intervencao() {
       descricao: descricao.trim(),
     }
 
-    setRegistros((anterior) => [novaIntervencao, ...anterior])
+    setRegistros((anterior) => [...anterior, novaIntervencao])
     setBusca("")
     setTipoSelecionado("Todos")
     setModalAberto(false)
+    setErro("")
   }
 
   function iniciais(nome) {
@@ -85,6 +87,20 @@ function Intervencao() {
     if (tipoIntervencao === "Conversa Individual") return "conversa"
     if (tipoIntervencao === "Contato com responsável") return "responsavel"
     return "encaminhamento"
+  }
+
+  function nomeAluno(id) {
+    return (
+      alunos.find((aluno) => aluno.id === id)?.nome ||
+      "Aluno não encontrado"
+    )
+  }
+
+  function turmaAluno(id) {
+    return (
+      alunos.find((aluno) => aluno.id === id)?.turma ||
+      "Turma não informada"
+    )
   }
 
   return (
@@ -108,6 +124,7 @@ function Intervencao() {
           </button>
         </header>
 
+        {/* Cards de resumo */}
         <section className="intervencao-resumo">
           <article className="intervencao-card">
             <div className="intervencao-card-topo">
@@ -137,12 +154,14 @@ function Intervencao() {
           </article>
         </section>
 
+        {/* Lista de registros */}
         <section className="intervencao-lista-card">
           <div className="intervencao-lista-cabecalho">
             <div>
               <h2>Registros de intervenção</h2>
               <p>Consulte as ações realizadas com cada aluno.</p>
             </div>
+
             <span className="intervencao-contador">
               {listaFiltrada.length}{" "}
               {listaFiltrada.length === 1 ? "registro" : "registros"}
@@ -178,8 +197,7 @@ function Intervencao() {
           {listaFiltrada.length > 0 ? (
             <div className="intervencao-lista">
               {listaFiltrada.map((item) => {
-                const aluno = alunos.find((a) => a.id === item.alunoId)
-                const nome = aluno?.nome || "Aluno não encontrado"
+                const nome = nomeAluno(item.alunoId)
 
                 return (
                   <article className="intervencao-item" key={item.id}>
@@ -191,7 +209,7 @@ function Intervencao() {
                       <div className="intervencao-aluno-linha">
                         <h3>{nome}</h3>
                         <span className="intervencao-turma">
-                          {aluno?.turma || "Turma não informada"}
+                          {turmaAluno(item.alunoId)}
                         </span>
                       </div>
 
@@ -203,6 +221,15 @@ function Intervencao() {
 
                       <p>{item.descricao}</p>
                     </div>
+
+                    <button
+                      type="button"
+                      className="intervencao-ver-detalhes"
+                      onClick={() => setDetalheSelecionado(item)}
+                    >
+                      Ver detalhes
+                      <span aria-hidden="true">→</span>
+                    </button>
 
                     <time className="intervencao-data" dateTime={item.data}>
                       <span aria-hidden="true">◷</span>
@@ -233,11 +260,92 @@ function Intervencao() {
           )}
         </section>
 
+        {/* Modal de detalhes */}
+        {detalheSelecionado && (
+          <div
+            className="intervencao-modal-fundo"
+            onMouseDown={(e) => {
+              if (e.target === e.currentTarget) {
+                setDetalheSelecionado(null)
+              }
+            }}
+          >
+            <section
+              className="intervencao-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="detalhe-intervencao-titulo"
+            >
+              <div className="intervencao-modal-cabecalho">
+                <div>
+                  <h2 id="detalhe-intervencao-titulo">
+                    Detalhes da intervenção
+                  </h2>
+                  <p>Informações completas do registro selecionado.</p>
+                </div>
+
+                <button
+                  type="button"
+                  className="intervencao-modal-fechar"
+                  onClick={() => setDetalheSelecionado(null)}
+                  aria-label="Fechar detalhes"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="intervencao-detalhes-conteudo">
+                <span className="intervencao-detalhes-label">Aluno</span>
+                <strong>{nomeAluno(detalheSelecionado.alunoId)}</strong>
+
+                <span className="intervencao-detalhes-label">Turma</span>
+                <strong>{turmaAluno(detalheSelecionado.alunoId)}</strong>
+
+                <span className="intervencao-detalhes-label">
+                  Tipo de intervenção
+                </span>
+                <div>
+                  <span
+                    className={`intervencao-etiqueta ${classeTipo(
+                      detalheSelecionado.tipo
+                    )}`}
+                  >
+                    {detalheSelecionado.tipo}
+                  </span>
+                </div>
+
+                <span className="intervencao-detalhes-label">Data</span>
+                <strong>
+                  {formatarData(detalheSelecionado.data)}
+                </strong>
+
+                <span className="intervencao-detalhes-label">
+                  Descrição
+                </span>
+                <p>{detalheSelecionado.descricao}</p>
+              </div>
+
+              <div className="intervencao-formulario-acoes">
+                <button
+                  type="button"
+                  className="intervencao-botao-principal"
+                  onClick={() => setDetalheSelecionado(null)}
+                >
+                  Fechar detalhes
+                </button>
+              </div>
+            </section>
+          </div>
+        )}
+
+        {/* Modal de cadastro */}
         {modalAberto && (
           <div
             className="intervencao-modal-fundo"
             onMouseDown={(e) => {
-              if (e.target === e.currentTarget) setModalAberto(false)
+              if (e.target === e.currentTarget) {
+                setModalAberto(false)
+              }
             }}
           >
             <section
@@ -248,13 +356,12 @@ function Intervencao() {
             >
               <div className="intervencao-modal-cabecalho">
                 <div>
-                  <span className="intervencao-eyebrow">
-                    NOVO REGISTRO
-                  </span>
                   <h2 id="intervencao-modal-titulo">
                     Nova intervenção
                   </h2>
-                  <p>Informe os dados da ação pedagógica realizada.</p>
+                  <p>
+                    Informe os dados da ação pedagógica realizada.
+                  </p>
                 </div>
 
                 <button
@@ -340,6 +447,7 @@ function Intervencao() {
                   >
                     Cancelar
                   </button>
+
                   <button
                     type="submit"
                     className="intervencao-botao-principal"

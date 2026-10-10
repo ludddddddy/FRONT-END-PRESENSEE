@@ -11,8 +11,6 @@
   color: var(--text-primary, #25243a);
 }
 
-/* Cabeçalho */
-
 .intervencao-header {
   display: flex;
   align-items: center;
@@ -22,9 +20,10 @@
 
 .intervencao-header h1 {
   margin: 4px 0 5px;
-  font-size: 27px;
+  font-size: 29px;
+  line-height: 1.25;
   font-weight: 750;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.6px;
 }
 
 .intervencao-header p,
@@ -32,14 +31,7 @@
   margin: 0;
   color: var(--text-secondary, #77758a);
   font-size: 14px;
-  line-height: 1.45;
-}
-
-.intervencao-eyebrow {
-  color: var(--accent-color, #6741e8);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 1.2px;
+  line-height: 1.5;
 }
 
 /* Botões */
@@ -68,7 +60,8 @@
 
 .intervencao-botao-principal:focus-visible,
 .intervencao-botao-secundario:focus-visible,
-.intervencao-modal-fechar:focus-visible {
+.intervencao-modal-fechar:focus-visible,
+.intervencao-ver-detalhes:focus-visible {
   outline: 3px solid #b9a9ff;
   outline-offset: 3px;
 }
@@ -117,7 +110,7 @@
   justify-content: space-between;
   gap: 10px;
   color: var(--text-secondary, #77758a);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .intervencao-icone {
@@ -131,16 +124,28 @@
   font-size: 19px;
 }
 
+.intervencao-card:nth-child(1) > strong {
+  color: #6741e8;
+}
+
+.intervencao-card:nth-child(2) > strong {
+  color: #1683c4;
+}
+
+.intervencao-card:nth-child(3) > strong {
+  color: #168653;
+}
+
 .intervencao-card > strong {
-  font-size: 27px;
-  line-height: 1.1;
+  font-size: 28px;
+  line-height: 1.15;
   font-weight: 750;
 }
 
 .intervencao-card > small {
   color: var(--text-secondary, #77758a);
-  font-size: 11px;
-  line-height: 1.4;
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 /* ========================================
@@ -166,7 +171,7 @@
 
 .intervencao-lista-cabecalho h2 {
   margin: 0 0 5px;
-  font-size: 19px;
+  font-size: 21px;
   font-weight: 750;
 }
 
@@ -176,13 +181,11 @@
   border-radius: 20px;
   background: rgb(103 65 232 / 9%);
   color: var(--accent-color, #6741e8);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 
-/* ========================================
-   BUSCA E FILTROS
-======================================== */
+/* Busca e filtros */
 
 .intervencao-filtros {
   display: grid;
@@ -216,7 +219,7 @@
   background: transparent;
   color: var(--text-primary, #25243a);
   font: inherit;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .intervencao-filtros select,
@@ -234,7 +237,7 @@
 }
 
 .intervencao-filtros select {
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .intervencao-filtros select:focus,
@@ -257,10 +260,10 @@
 
 .intervencao-item {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) 105px;
+  grid-template-columns: 40px minmax(0, 1fr) auto 105px;
   align-items: center;
   gap: 12px;
-  padding: 15px 0;
+  padding: 16px 0;
   border-top: 1px solid var(--border-color, #e8e6f0);
 }
 
@@ -281,7 +284,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
+  gap: 7px;
   min-width: 0;
 }
 
@@ -294,21 +297,21 @@
 
 .intervencao-item h3 {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 750;
 }
 
 .intervencao-turma {
   color: var(--text-secondary, #77758a);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .intervencao-etiqueta {
   display: inline-flex;
   align-items: center;
-  padding: 4px 8px;
+  padding: 5px 9px;
   border-radius: 7px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -331,8 +334,43 @@
   margin: 0;
   overflow-wrap: anywhere;
   color: var(--text-primary, #25243a);
-  font-size: 13px;
-  line-height: 1.45;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* Botão Ver detalhes à direita */
+
+.intervencao-ver-detalhes {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  gap: 8px;
+  white-space: nowrap;
+  padding: 9px 12px;
+  border: 1px solid #d9ceff;
+  border-radius: 9px;
+  background: #f1edff;
+  color: #6036d9;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.intervencao-ver-detalhes span {
+  font-size: 17px;
+  transition: transform 0.2s;
+}
+
+.intervencao-ver-detalhes:hover {
+  background: #e5dcff;
+  border-color: #b9a5ff;
+}
+
+.intervencao-ver-detalhes:hover span {
+  transform: translateX(3px);
 }
 
 .intervencao-data {
@@ -342,7 +380,7 @@
   gap: 7px;
   padding-top: 3px;
   color: var(--text-secondary, #77758a);
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
@@ -396,7 +434,7 @@
 }
 
 /* ========================================
-   MODAL DE CADASTRO
+   MODAIS
 ======================================== */
 
 .intervencao-modal-fundo {
@@ -434,7 +472,7 @@
 }
 
 .intervencao-modal-cabecalho h2 {
-  margin: 7px 0;
+  margin: 0 0 7px;
   font-size: 23px;
 }
 
@@ -458,6 +496,41 @@
   font-size: 25px;
   cursor: pointer;
 }
+
+/* Detalhes da intervenção */
+
+.intervencao-detalhes-conteudo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 4px 0 24px;
+}
+
+.intervencao-detalhes-label {
+  margin-top: 8px;
+  color: var(--text-secondary, #77758a);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.intervencao-detalhes-conteudo > strong {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.intervencao-detalhes-conteudo > p {
+  width: 100%;
+  margin: 0;
+  padding: 12px;
+  border-radius: 9px;
+  background: var(--input-bg, #f7f6fb);
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+/* Formulário */
 
 .intervencao-formulario {
   display: flex;
@@ -502,6 +575,22 @@
 /* ========================================
    RESPONSIVIDADE
 ======================================== */
+
+@media (max-width: 1100px) {
+  .intervencao-item {
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+  }
+
+  .intervencao-ver-detalhes {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .intervencao-data {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
 
 @media (max-width: 900px) {
   .intervencao-resumo {
@@ -559,9 +648,15 @@
     gap: 10px;
   }
 
+  .intervencao-ver-detalhes {
+    grid-column: 2;
+    grid-row: auto;
+    justify-self: start;
+  }
+
   .intervencao-data {
     grid-column: 2;
-    grid-row: 3;
+    grid-row: auto;
     justify-content: flex-start;
   }
 

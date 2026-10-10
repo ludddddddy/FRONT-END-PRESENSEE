@@ -10,8 +10,10 @@ import Frequencia from "./pages/Frequencia"
 import Relatorios from "./pages/Relatorios"
 import Turmas from "./pages/Turmas"
 import NovoAluno from "./pages/NovoAluno"
+import Intervencao from "./pages/Intervencao"
 import Diario from "./pages/Diario"
 import AlunoPerfil from "./pages/AlunoPerfil"
+
 
 import ProtectedRoute from "./components/ProtectedRoute"
 
@@ -60,6 +62,15 @@ function App() {
             <ProtectedRoute>
               <NovoAluno />
             </ProtectedRoute>
+          }
+        />
+
+        <Route
+         path="/intervencao"
+         element={
+           <ProtectedRoute>
+           <Intervencao />
+          </ProtectedRoute>
           }
         />
 
